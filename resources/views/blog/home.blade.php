@@ -9,6 +9,11 @@
         <h1>{{ $title }}</h1>
         {!! $description !!}
 
+        @if (session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
        
         <div class="posts row gx-0">
             @foreach ($posts as $post)

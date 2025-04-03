@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\Authenticate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,10 +17,12 @@ use Illuminate\Support\Facades\Route;
 /**
  * GET | POST | PUT | DELETE
  */
-Route::get('/', 'App\Http\Controllers\BlogController@index')->name('welcome');
-Route::get('/register', 'App\Http\Controllers\BlogController@register')->name('register');
+Route::get('/', 'App\Http\Controllers\BlogController@index')->name('welcome'); //->middleware('auth');
+Route::get('/register', 'App\Http\Controllers\BlogController@register')->name('register')->middleware('guest');
 Route::post('/register/save', 'App\Http\Controllers\BlogController@registerSave')->name('register.save');
-Route::get('/login', 'App\Http\Controllers\BlogController@login')->name('login');
+Route::get('/login', 'App\Http\Controllers\BlogController@login')->name('login')->middleware('guest');
+Route::post('/login/authenticate', 'App\Http\Controllers\BlogController@authenticate')->name('login.authenticate');
+Route::delete('/logout', 'App\Http\Controllers\BlogController@logout')->name('logout');
 
 Route::prefix('blog')->namespace('App\Http\Controllers')->name('blog.')->group(function () {
 
@@ -31,68 +34,36 @@ Route::prefix('blog')->namespace('App\Http\Controllers')->name('blog.')->group(f
 
     Route::get('/categories/show/{id}', 'BlogController@showCategory')->name('show.category');
 });
-// Mise en place des routes pour l'administration du site
-Route::prefix('admin')->namespace('App\Http\Controllers')->name('admin.')->group(function () {
+
+Route::prefix('admin')->name('admin.')->middleware('admin')->namespace('App\Http\Controllers')->group(function(){
+    // Routes des postes
     Route::get('/posts', 'PostController@index')->name('post.index');
     Route::get('/posts/create', 'PostController@create')->name('post.create');
     Route::post('/posts/store', 'PostController@store')->name('post.store');
     Route::get('/posts/edit/{id}', 'PostController@edit')->name('post.edit');
     Route::get('/posts/view/{id}', 'PostController@view')->name('post.view');
     Route::put('/posts/update/{id}', 'PostController@update')->name('post.update');
-    Route::delete('/posts/delete/{id}', 'PostController@delete')->name('post.delete');   
-});
+    Route::delete('/posts/delete/{id}', 'PostController@delete')->name('post.delete'); 
 
-Route::prefix('admin')->name('admin.')->group(function(){
+    // Routes des catégories
+    Route::get('/categories', 'CategoryController@index')->name('category.index');
+    Route::get('/categories/show/{id}', 'CategoryController@show')->name('category.show');
+    Route::get('/categories/create', 'CategoryController@create')->name('category.create');
+    Route::get('/categories/edit/{id}', 'CategoryController@edit')->name('category.edit');
+    Route::post('/categories/store', 'CategoryController@store')->name('category.store');
+    Route::put('/categories/update/{category}', 'CategoryController@update')->name('category.update');
+    Route::put('/categories/speed/{category}', 'CategoryController@updateSpeed')->name('category.update.speed');
+    Route::delete('/categories/delete/{category}', 'CategoryController@delete')->name('category.delete');
 
-    //Get Categories datas
-    Route::get('/categories', 'App\Http\Controllers\CategoryController@index')->name('category.index');
-
-    //Show Category by Id
-    Route::get('/categories/show/{id}', 'App\Http\Controllers\CategoryController@show')->name('category.show');
-
-    //Get Categories by Id
-    Route::get('/categories/create', 'App\Http\Controllers\CategoryController@create')->name('category.create');
-
-    //Edit Category by Id
-    Route::get('/categories/edit/{id}', 'App\Http\Controllers\CategoryController@edit')->name('category.edit');
-
-    //Save new Category
-    Route::post('/categories/store', 'App\Http\Controllers\CategoryController@store')->name('category.store');
-
-    //Update One Category
-    Route::put('/categories/update/{category}', 'App\Http\Controllers\CategoryController@update')->name('category.update');
-
-    //Update One Category Speedly
-    Route::put('/categories/speed/{category}', 'App\Http\Controllers\CategoryController@updateSpeed')->name('category.update.speed');
-
-    //Delete Category
-    Route::delete('/categories/delete/{category}', 'App\Http\Controllers\CategoryController@delete')->name('category.delete');
+    //Routes des utilisateurs
+     Route::get('/users', 'UserController@index')->name('user.index');
+     Route::get('/users/show/{id}', 'UserController@show')->name('user.show');
+     Route::get('/users/create', 'UserController@create')->name('user.create');
+     Route::get('/users/edit/{id}', 'UserController@edit')->name('user.edit');
+     Route::post('/users/store', 'UserController@store')->name('user.store');
+     Route::put('/users/update/{user}', 'UserController@update')->name('user.update');
+     Route::put('/users/speed/{user}', 'UserController@updateSpeed')->name('user.update.speed');
+     Route::delete('/users/delete/{user}', 'UserController@delete')->name('user.delete');
 
 });
-Route::prefix('admin')->name('admin.')->group(function(){
 
-    //Get Users datas
-    Route::get('/users', 'App\Http\Controllers\UserController@index')->name('user.index');
-
-    //Show User by Id
-    Route::get('/users/show/{id}', 'App\Http\Controllers\UserController@show')->name('user.show');
-
-    //Get Users by Id
-    Route::get('/users/create', 'App\Http\Controllers\UserController@create')->name('user.create');
-
-    //Edit User by Id
-    Route::get('/users/edit/{id}', 'App\Http\Controllers\UserController@edit')->name('user.edit');
-
-    //Save new User
-    Route::post('/users/store', 'App\Http\Controllers\UserController@store')->name('user.store');
-
-    //Update One User
-    Route::put('/users/update/{user}', 'App\Http\Controllers\UserController@update')->name('user.update');
-
-    //Update One User Speedly
-    Route::put('/users/speed/{user}', 'App\Http\Controllers\UserController@updateSpeed')->name('user.update.speed');
-
-    //Delete User
-    Route::delete('/users/delete/{user}', 'App\Http\Controllers\UserController@delete')->name('user.delete');
-
-});

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LoginFormRequest;
 use App\Http\Requests\UserFormRequest;
 use App\Models\Post;
 use App\Models\Category;
@@ -9,10 +10,18 @@ use EsperoSoft\Faker\Faker;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class BlogController extends Controller
 {
+
+
     public function index() {
+        /*
+        $user = User::find(Auth::user()->id);
+        $user->roles = json_encode(["ROLE_ADMIN", "ROLE_USER"]);
+        $user->save();
+        */
         $title = "Welcome to Blog";
         $description = "<h3>Welcome to Blog description</h3>";
         
@@ -84,12 +93,25 @@ class BlogController extends Controller
     public function registerSave(UserFormRequest $request)
     {
         $data = $request->validated();
+       
 
         $data["password"] = bcrypt($data["password"]);
-
+        //dd($data);
         $user = User::create($data);
 
         return redirect()->route('login')->with("success", "Enregistrement avec succès !");
+    }
+
+    public function authenticate(LoginFormRequest $request)
+    {
+        $user = $request->validated();
+        //dd($user);
+
+        if(Auth::attempt($user)) {
+            return redirect()->route("welcome")->with("success", "Vous ête connecté !");
+        }else {
+            return redirect()->route("login")->with("error", "identifiant incorrect !");
+        }
     }
 
     public function login()
@@ -97,6 +119,11 @@ class BlogController extends Controller
         return view("blog.login");
     }
 
+    public function logout()
+    {
+        Auth::logout();
 
+        return redirect()->route("welcome")->with("success", "Vous êtes déconnecté !");
+    }
     
 }
