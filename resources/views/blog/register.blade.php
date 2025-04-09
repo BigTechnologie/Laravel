@@ -7,7 +7,10 @@
 
 @section('container')
     <div class="container">
-        <h1>Register Form</h1>
+        {{--  <h1>Register Form</h1> --}}
+       {{--  <h1>{{ __('property.contact_title') }}</h1> --}}
+       
+       <h1>{{ __('Interested in this property ?') }}</h1>
 
         <form action="{{ route('register.save') }}" method="POST">
 

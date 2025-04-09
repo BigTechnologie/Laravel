@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\MailController;
 use App\Http\Middleware\Authenticate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -16,7 +17,11 @@ use Illuminate\Support\Facades\Route;
 */
 /**
  * GET | POST | PUT | DELETE
- */
+*/
+
+Route::get('/send-mail', [MailController::class, 'showForm'])->name('send.mail.form');
+Route::post('/send-mail', [MailController::class, 'sendMail'])->name('send.mail');
+
 Route::get('/', 'App\Http\Controllers\BlogController@index')->name('welcome'); //->middleware('auth');
 Route::get('/register', 'App\Http\Controllers\BlogController@register')->name('register')->middleware('guest');
 Route::post('/register/save', 'App\Http\Controllers\BlogController@registerSave')->name('register.save');
@@ -65,5 +70,10 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->namespace('App\Http
      Route::put('/users/speed/{user}', 'UserController@updateSpeed')->name('user.update.speed');
      Route::delete('/users/delete/{user}', 'UserController@delete')->name('user.delete');
 
+});
+
+
+Route::fallback(function () {
+    return 'Oups, nous ne trouvon s pas cette page !';
 });
 

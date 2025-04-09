@@ -29,7 +29,7 @@ class PostFormRequest extends FormRequest
             "required|unique:posts|min:6|max:60":                   
             "required|min:6|max:60";                               
         return [
-            //
+            
             "title"=> $titleRules,
             "slug" => '',
             "imageUrl" => $imageRules,
